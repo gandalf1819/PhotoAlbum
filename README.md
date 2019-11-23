@@ -5,6 +5,7 @@ Lex, ElasticSearch, and Rekognition for an intelligent search layer to query you
 
 ## Architecture
 
+![PhotoAlbum](https://github.com/NikhilNar/PhotoAlbum/blob/master/architecture.png)
 
 ## Team
 
