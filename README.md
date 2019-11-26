@@ -7,6 +7,11 @@ Lex, ElasticSearch, and Rekognition for an intelligent search layer to query you
 
 ![PhotoAlbum](https://github.com/NikhilNar/PhotoAlbum/blob/master/architecture.png)
 
+# Commands to package and deploy SAM templates
+  sam package --template-file template.yml --s3-bucket sam-templates-niknar --output-template-file output-template.yml
+  sam deploy --template-file output-template.yml --stack-name photoalbum --capabilities CAPABILITY_IAM
+  sam delete-stack --stack-name photoalbum  
+
 ## Team
 
 * [Nikhil Nar](https://github.com/NikhilNar)

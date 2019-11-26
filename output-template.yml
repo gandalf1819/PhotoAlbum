@@ -1,0 +1,23 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  LF1:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs10.x
+      CodeUri: s3://sam-templates-niknar/76c2959578fae64f0658eebd2baf624a
+      Handler: image_indexing.handler
+      Policies:
+      - AWSLambdaExecute
+      - CloudWatchLogsFullAccess
+      - AmazonRekognitionFullAccess
+      - AmazonVPCFullAccess
+      Events:
+        UploadPhotoEvent:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: B2
+            Events: s3:ObjectCreated:*
+  B2:
+    Type: AWS::S3::Bucket
