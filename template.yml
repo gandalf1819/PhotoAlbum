@@ -4,9 +4,9 @@ Resources:
   LF1:
     Type: AWS::Serverless::Function
     Properties: 
-      Runtime: nodejs10.x
+      Runtime: python3.7
       CodeUri: ./lambda-functions
-      Handler: image_indexing.handler
+      Handler: image_indexing.lambda_handler
       Policies: 
         - AWSLambdaExecute
         - CloudWatchLogsFullAccess
@@ -20,6 +20,15 @@ Resources:
             Events: s3:ObjectCreated:*
   B2:
     Type: AWS::S3::Bucket
+  InputValidatorAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionBody:
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: s3://cc-chatbot-niknar/swagger.yaml  
   # Sample for Elasticsearch, to be changed
   # ElasticSearchInstance:
   #   Type: AWS::Elasticsearch::Domain

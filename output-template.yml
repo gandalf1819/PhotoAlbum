@@ -4,9 +4,9 @@ Resources:
   LF1:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: nodejs10.x
-      CodeUri: s3://sam-templates-niknar/76c2959578fae64f0658eebd2baf624a
-      Handler: image_indexing.handler
+      Runtime: python3.7
+      CodeUri: s3://sam-templates-niknar/fd58ad41cf0e3e9123e04e88fa851610
+      Handler: image_indexing.lambda_handler
       Policies:
       - AWSLambdaExecute
       - CloudWatchLogsFullAccess
