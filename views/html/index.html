@@ -5,35 +5,55 @@
       <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
       <link rel="stylesheet" type="text/css" href="../css/style.css">
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+      <!-- ZMDI Material Design CDN -->
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css"> 
-      <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet"> -->
+      <!-- Latest compiled and minified CSS -->
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
       <script type="text/javascript" src="../js/main.js"></script>
     <body>
+      <!-- Real-time search using Amazon Transcribe-->
       <div class="search">
           <div class="search-input">
-            <!-- <i class="material-icons search"></i> -->
             <i class="zmdi zmdi-search zmdi-hc-2x"></i>
             <input type="text" />
             <i class="zmdi zmdi-mic zmdi-hc-2x"></i>
-            <!-- <i class="material-icons mic"></i> -->
+            <!-- <i class="zmdi zmdi-mic-off zmdi-hc-2x"></i> -->
           </div>
-            <div class="results">
-            <p>Top answer based on similar people searching.</p>
-            <div class="description">
-              <div class="photo"></div>
-              <div class="summary">
-                <h3>Meadowbank Gymnastics Club</h3>
-              <p>Meadowbank Gymnastics Club was established in 1971 by Maggie     Bisset. Our club offer classes from beginner to elite and disabilities. Meadowbank Gymnastics Club is GymMark accredited.</p>
-                <a href="www.meadowbankgc.co.uk">www.meadowbankgc.co.uk</a>
-              </div>
-            </div>
+          <div class="results">
           </div>
           <div class="button-row">
             <button id="search">Search</button>
+            <button id="start-btn" title="Start Recording"><i class="zmdi zmdi-play-circle-outline zmdi-hc-lg"></i></button>
+            <button id="pause-btn" title="Pause Recording"><i class="zmdi zmdi-pause-circle-outline zmdi-hc-lg"></i></button>
+            <button id="upload-btn" title="Upload photos"><i class="zmdi zmdi-cloud-upload zmdi-hc-lg"></i></button>
             <div id="clear">Clear All</div>
           </div>
       </div>
+
+      <!-- Upload Photos -->
+      <!-- <br/><br/><br/><br/><br/><br/>
+      <div class="container">
+        <form>
+          <div class="row">
+            <div class="col-sm-7 col-md-6 col-lg-5">
+      
+              <div class="form-group">
+                <label for="file" class="sr-only">File</label>
+                <div class="input-group">
+                  <input type="text" name="filename" class="form-control" placeholder="No file selected" readonly>
+                  <span class="input-group-btn">
+                    <div class="btn btn-default  custom-file-uploader">
+                      <input type="file" name="file" onchange="this.form.filename.value = this.files.length ? this.files[0].name : ''" />
+                      Select a file
+                    </div>
+                  </span>
+                </div>
+              </div>
+      
+            </div>
+          </div>
+        </form>
+    </div> -->
 
     </body>
   </head>
