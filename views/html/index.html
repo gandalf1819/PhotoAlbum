@@ -9,51 +9,59 @@
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css"> 
       <!-- Latest compiled and minified CSS -->
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+      <!-- AWS SDK apigClient -->
+      <script type="text/javascript" src="../js/lib/axios/dist/axios.standalone.js"></script>
+      <script type="text/javascript" src="../js/lib/CryptoJS/rollups/hmac-sha256.js"></script>
+      <script type="text/javascript" src="../js/lib/CryptoJS/rollups/sha256.js"></script>
+      <script type="text/javascript" src="../js/lib/CryptoJS/components/hmac.js"></script>
+      <script type="text/javascript" src="../js/lib/CryptoJS/components/enc-base64.js"></script>
+      <script type="text/javascript" src="../js/lib/url-template/url-template.js"></script>
+      <script type="text/javascript" src="../js/lib/apiGatewayCore/sigV4Client.js"></script>
+      <script type="text/javascript" src="../js/lib/apiGatewayCore/apiGatewayClient.js"></script>
+      <script type="text/javascript" src="../js/lib/apiGatewayCore/simpleHttpClient.js"></script>
+      <script type="text/javascript" src="../js/lib/apiGatewayCore/utils.js"></script>
+      <script type="text/javascript" src="../js/apigClient.js"></script>
+      <!-- File upload script -->
       <script type="text/javascript" src="../js/main.js"></script>
-    <body>
-      <!-- Real-time search using Amazon Transcribe-->
-      <div class="search">
-          <div class="search-input">
-            <i class="zmdi zmdi-search zmdi-hc-2x"></i>
-            <input type="text" />
-            <i class="zmdi zmdi-mic zmdi-hc-2x"></i>
-            <!-- <i class="zmdi zmdi-mic-off zmdi-hc-2x"></i> -->
-          </div>
-          <div class="results">
-          </div>
-          <div class="button-row">
-            <button id="search">Search</button>
-            <button id="start-btn" title="Start Recording"><i class="zmdi zmdi-play-circle-outline zmdi-hc-lg"></i></button>
-            <button id="pause-btn" title="Pause Recording"><i class="zmdi zmdi-pause-circle-outline zmdi-hc-lg"></i></button>
-            <button id="upload-btn" title="Upload photos"><i class="zmdi zmdi-cloud-upload zmdi-hc-lg"></i></button>
-            <div id="clear">Clear All</div>
-          </div>
-      </div>
+      <!-- AWS Transcribe script -->
+      <script type="text/javascript" src="../js/transcribe.js"></script>
 
-      <!-- Upload Photos -->
-      <!-- <br/><br/><br/><br/><br/><br/>
-      <div class="container">
-        <form>
-          <div class="row">
-            <div class="col-sm-7 col-md-6 col-lg-5">
-      
-              <div class="form-group">
-                <label for="file" class="sr-only">File</label>
-                <div class="input-group">
-                  <input type="text" name="filename" class="form-control" placeholder="No file selected" readonly>
-                  <span class="input-group-btn">
-                    <div class="btn btn-default  custom-file-uploader">
-                      <input type="file" name="file" onchange="this.form.filename.value = this.files.length ? this.files[0].name : ''" />
-                      Select a file
-                    </div>
-                  </span>
-                </div>
-              </div>
-      
+    <body>
+      <!-- Real-time search using Amazon Transcribe -->
+      <div class="search">
+          <form method="GET">
+            <div class="search-input">
+              <i class="zmdi zmdi-search zmdi-hc-2x"></i> 
+              <input type="text" id="search-phrase" name="q"/>
+              <i class="zmdi zmdi-mic zmdi-hc-2x"></i>
+            </div>
+            <div class="results">
+            </div>
+            <!-- Search Bar buttons -->
+            <div class="button-row">
+              <button id="search" type="submit" onclick="searchPhotosS3()">Search</button>
+              <button id="start-btn" title="Start Recording"><i class="zmdi zmdi-play-circle-outline zmdi-hc-lg"></i></button>
+              <button id="pause-btn" title="Pause Recording"><i class="zmdi zmdi-pause-circle-outline zmdi-hc-lg"></i></button>
+              <div id="clear">Clear All</div>
+            </div>
+          </form>
+
+          <!-- TODO: Image grid for search results -->
+          <div class="gallery">
+              <!-- <figure class=”gallery__item gallery__item--1"> -->
+                  <!-- <img src="img/image-1.jpg" class="gallery__img" alt="Image 1"> -->
+              <!-- </figure> -->
+          </div>
+
+          <h3 id="result" style="color: green;"></h3>
+          
+          <!-- <div class="input-group" style="margin-top:30px;"> -->
+          <div class="input-group">
+            <input type="file" class="form-control" name="search" id="file_path">
+            <button id="upload-btn" title="Upload photos" type="submit" onclick="uploadPhotosS3()"><i class="zmdi zmdi-cloud-upload zmdi-hc-lg"></i></button>
             </div>
           </div>
-        </form>
-    </div> -->
+      </div>
 
     </body>
   </head>
