@@ -1,166 +1,154 @@
-// Search Photos on submit
-function searchPhotosS3() {
-  $('#search').on('submit', function (e) {
-      e.preventDefault();  //prevent form from submitting
-      let data = {};
-      // Fetch query text from URL
-      let query_text = getUrlParameter("q");
-      var apigClient = apigClientFactory.newClient();
+// API Gateway SDK
+var apigClient = apigClientFactory.newClient();
 
-      var body = {};
-      var params = {
-        q_text : query_text
-      };
-      var additionalParams = {
-        headers: {
-          'Content-Type':"application/json"
-        }
-      };
-
-      apigClient.searchGet(params, body , additionalParams).then(function(res){
-          var data = {}
-          var data_array = []
-          resp_data  = res.data
-          length_of_response = resp_data.length;
-          if(length_of_response == 0) {
-            document.getElementById("displaytext").innerHTML = "No images found for your search query!"
-            document.getElementById("displaytext").style.display = "block";
-
-          }
-          resp_data.forEach(function(obj) {
-            var json = {}
-            json["bannerImg1"] = obj["imageUrl"];
-            data_array.push(json) }
-          );
-
-          data["images"] = data_array;
-          console.log(data);
-          data.images.forEach( function(obj) {
-
-              var img = new Image();
-              img.src = obj.bannerImg1;
-              img.setAttribute("class", "banner-img");
-              img.setAttribute("alt", "effy");
-              document.getElementById("result").innerHTML = "Images returnes are : "
-              document.getElementById("img-container").appendChild(img);
-              document.getElementById("displaytext").style.display = "block";
-
-            });
-        }).catch(function(result) {
-          console.log("Error : ", result);
-          botMessage = "Couldn't establish connection to API Gateway"
-          reject(result);
-        });
+// Expand the search icon
+$(function () {
+    $(".search-input").on("click", function() {
+      console.log("onClick function triggered!")
+      // alert("onClick function triggered!")
+      $(".search").addClass("active");
+      setTimeout(function() {
+        console.log("this is on-click search event!")
+        
+        $("input", this).addClass("active").focus();
+      }.bind(this), 300);
+    });
   });
-}
 
-// Upload photos on submit
-function uploadPhotosS3() {
-  $('#contact').on('submit', function (e) {
-      e.preventDefault();  //prevent form from submitting
-      let data = {};
-      var file = document.getElementById('file_path').files[0];
-      console.log("File path: ", file);
-      var encoded_image = getBase64(file).then(
-        data => {
-        console.log(data);
-        var apigClient = apigClientFactory.newClient();
-    
-        var file_type = file.type + ";base64"
-    
-        var body = data;
-        var params = {"item" : file.name, "folder" : "photo-file" , "Content-Type" : file_type};
-        var additionalParams = {};
-        apigClient.uploadFolderItemPut(params, body , additionalParams).then(function(res){
-          if (res.status == 200) {
-            document.getElementById("result").innerHTML = "Image uploaded!"
-            document.getElementById("result").style.display = "block";
-          }
-        })
-      });
-  });
-}
-
-// Get Base64 encode file data from input form
-function getBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    // reader.onload = () => resolve(reader.result)
-    reader.onload = () => {
-      let encoded = reader.result.replace(/^data:(.*;base64,)?/, '');
-      if ((encoded.length % 4) > 0) {
-        encoded += '='.repeat(4 - (encoded.length % 4));
-      }
-      resolve(encoded);
-    };
-    reader.onerror = error => reject(error);
-  });
-}
-
-var getUrlParameter = function getUrlParameter(sParam) {
-  var sPageURL = window.location.search.substring(1),
-      sURLVariables = sPageURL.split('&'),
-      sParameterName,
-      i;
-
-  for (i = 0; i < sURLVariables.length; i++) {
-      sParameterName = sURLVariables[i].split('=');
-
-      if (sParameterName[0] === sParam) {
-          return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
-      }
-  }
+// Display image results in front-end
+function showImage(src, width, height, alt) {
+    var img = document.createElement("img");
+    img.src = src;
+    img.width = width;
+    img.height = height;
+    img.alt = alt;
 };
 
-$(function () {
-  $(".search-input").on("click", function() {
-    console.log("onClick function triggered!")
-    // alert("onClick function triggered!")
-    $(".search").addClass("active");
-    setTimeout(function() {
-      console.log("this is on-click search event!")
-      // alert("this is on-click search event!")
-      $("input", this).addClass("active").focus();
-    }.bind(this), 300);
-  });
+// Upload Photos on photo album
+$(document).ready(function(){
+    $("#upload-btn").click(function(){
+        // var fd = new FormData();
+        var files = $('#file')[0].files[0];
+        // fd.append('file',files);
+        // console.log(fd)
+        console.log(files)
+        console.log(files.type)
+        console.log(files.name)
+        let config = {
+            headers:{'Content-Type': files.type , "X-Api-Key":"TJEJcFBWPa4Vc2bjUn7pT1vN3HKbqJGZ8vDcwWw3", }
+        };
+        url = 'https://3ff1u19bck.execute-api.us-east-1.amazonaws.com/Prod/upload/photoalbum-b2-1tofw05nrs04i/' + files.name
+        axios.put(url,files,config).then(response=>{
+            // console.log(response.data)
+            alert("Image uploaded successfully!");
+        })
+    });
 });
 
-$("#clear").on("click", function() {
-  $(".results").addClass("quick-hide");
-  $(".zmdi-mic").addClass("quick-hide");
-
-  setTimeout(function() { 
-      $(".quick-hide").removeClass("quick-hide");    
-  }, 800);
-
-  $(".search").removeClass("showing-results");
-  setTimeout(function() {
-      $(".search").removeClass("active");
-  }, 300);
-
-  $(".search input").val("");
-  
+var rec=Recorder({
+    bitRate:32,
+    sampleRate:24000
 });
 
-$(".search-input input").on("keypress", function(e) {
-var keyCode = e.keyCode || e.which;
-  if (keyCode == '13'){
-    // Enter pressed
-    $(".search").addClass("showing-results"); 
-    return false;
-  }
-});
-
-$("#search").on("click", function() {
-  $(".search").addClass("showing-results"); 
-});
-
-// // Invoke AWS Transcribe service
-// var transcribeservice = new AWS.TranscribeService();
-// transcribeservice.createVocabulary(params, function (err, data) {
-//   if (err) console.log(err, err.stack); // an error occurred
-//   else     console.log(data);           // successful response
-// });
+// Image search using transcription
+function searchPhotosS3(data) {
+    let config = {
+            headers:{'Content-Type': data.type}
+    };
+    url = 'https://3ff1u19bck.execute-api.us-east-1.amazonaws.com/Prod/upload/transcribe-notes/test.mp3'
+    axios.put(url,data,config).then(response=>{
+        console.log(response.data)
+        // alert("Upload successful!!");
+        query = "transcriptionStart";
+        params = {q: query};
+        apigClient.searchGet(params, {}, {})
+            .then(function(result){
+                // Success callback
+                console.log(result);
+            }).catch(function(result){
+                // Error callback
+                console.log(result);
+            });
+        setTimeout(function(){
+            params = {q: "transcriptionEnd"};
+            apigClient.searchGet(params, {}, {})
+            .then(function(result){
+            // Success callback
+            console.log(result);
     
+            let img_list = result.data
+            if(img_list === "No such photos") {
+                alert("No images found for your search query!")
+                return
+            }
+            for (var i = 0; i < img_list.length; i++) {
+                img_url = img_list[i];
+                new_img = document.createElement('img');
+                new_img.src = img_url;
+                document.body.appendChild(new_img);
+            }
+            
+            }).catch(function(result){
+                // Error callback
+                console.log(result);
+                alert("No images found!");
+            });
+        }, 120000);
+    }).catch(err => {
+        console.log(err);
+    })
+}
 
+// Start transcription
+$(".start-btn").on("click", function() {
+    console.log('start-btn clicked')
+    // record.disabled = true;
+    // start-btn.style.backgroundColor = "blue"
+    // stopRecord.disabled=false;
+    rec.open(function(){
+        rec.start();
+    },function(msg,isUserNotAllow){
+        console.log((isUserNotAllow?"UserNotAllow，":"")+"can't record:"+msg);
+    });
+});
+
+// Stop transcription
+$(".pause-btn").on("click", function() {
+    console.log("pause-btn clicked")
+    // record.disabled = false;
+    // stop.disabled=true;
+    // record.style.backgroundColor = "red"
+    rec.stop(function(blob,duration){
+        console.log(URL.createObjectURL(blob),"Duration:"+duration+"ms");
+        console.log(blob);
+        rec.close();
+        var audio=document.createElement("audio");
+        audio.controls=true;
+        document.body.appendChild(audio);
+        audio.src=URL.createObjectURL(blob);
+        // audio.play();
+        searchPhotosS3(blob);
+    });
+});
+
+// Search image results
+$('#search-btn').click(function() {
+    query = $('#search-phrase').val();
+    params = {q: query};
+    apigClient.searchGet(params, {}, {})
+        .then(function(result){
+        
+        console.log(result);
+        
+        let img_list = result.data
+        for (var i = 0; i < img_list.length; i++) {
+            img_url = img_list[i];
+            new_img = document.createElement('img');
+            new_img.src = img_url;
+            document.body.appendChild(new_img);
+        }
+        
+        }).catch(function(result){
+            console.log(result);
+        });
+});
