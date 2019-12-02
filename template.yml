@@ -18,8 +18,24 @@ Resources:
           Properties:
             Bucket: !Ref B2
             Events: s3:ObjectCreated:*
+
   B2:
     Type: AWS::S3::Bucket
+
+
+  LF2:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.7
+      CodeUri: ./lambda-functions
+      Handler: image_search.lambda_handler
+      Policies:
+        - AWSLambdaExecute
+        - CloudWatchLogsFullAccess
+        - AmazonRekognitionFullAccess
+        - AmazonVPCFullAccess
+        - AmazonLexFullAccess
+
   # Sample for Elasticsearch, to be changed
   # ElasticSearchInstance:
   #   Type: AWS::Elasticsearch::Domain
