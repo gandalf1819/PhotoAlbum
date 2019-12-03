@@ -28,7 +28,7 @@ function showImage(src, width, height, alt) {
 $(document).ready(function(){
     $("#upload-btn").click(function(){
         // var fd = new FormData();
-        var files = $('#file')[0].files[0];
+        var files = $('#file_path')[0].files[0];
         // fd.append('file',files);
         // console.log(fd)
         console.log(files)
@@ -101,7 +101,7 @@ function searchPhotosS3(data) {
 
 // Start transcription
 $(".start-btn").on("click", function() {
-    console.log('start-btn clicked')
+    alert('start-btn clicked');
     // record.disabled = true;
     // start-btn.style.backgroundColor = "blue"
     // stopRecord.disabled=false;
@@ -114,7 +114,7 @@ $(".start-btn").on("click", function() {
 
 // Stop transcription
 $(".pause-btn").on("click", function() {
-    console.log("pause-btn clicked")
+    alert("pause-btn clicked")
     // record.disabled = false;
     // stop.disabled=true;
     // record.style.backgroundColor = "red"
