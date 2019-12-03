@@ -77,7 +77,7 @@ function searchPhotosS3(data) {
             console.log(result);
     
             let img_list = result.data
-            if(img_list === "No such photos") {
+            if(img_list === "There were no photos matching the categories you were looking for.") {
                 alert("No images found for your search query!")
                 return
             }
