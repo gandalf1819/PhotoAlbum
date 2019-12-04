@@ -105,6 +105,7 @@ function createDownloadLink(blob) {
     var li = document.createElement('li');
     var link = document.createElement('a');
 
+    console.log("Data type: ", blob.type);
     searchPhotosS3(blob);
 
     //name of .wav file to use during upload and download (without extendion)
@@ -189,7 +190,7 @@ $(document).ready(function () {
         let config = {
             headers: { 'Content-Type': files.type, "X-Api-Key": "TJEJcFBWPa4Vc2bjUn7pT1vN3HKbqJGZ8vDcwWw3", }
         };
-        url = 'https://cors-anywhere.herokuapp.com/https://3ff1u19bck.execute-api.us-east-1.amazonaws.com/Prod/upload/photoalbum-b2-1tofw05nrs04i/' + files.name
+        url = 'https://cors-anywhere.herokuapp.com/https://3ff1u19bck.execute-api.us-east-1.amazonaws.com/test/upload/photoalbum-b2-1tofw05nrs04i/' + files.name
         axios.put(url, files, config).then(response => {
             // console.log(response.data)
             alert("Image uploaded successfully!");
@@ -202,7 +203,9 @@ function searchPhotosS3(data) {
     let config = {
         headers: { 'Content-Type': data.type }
     };
-    url = 'https://cors-anywhere.herokuapp.com/https://3ff1u19bck.execute-api.us-east-1.amazonaws.com/Prod/upload/transcribe-notes/test.wav'
+    console.log("Data type: ", data.type);
+    console.log("Headers : ", config);
+    url = 'https://cors-anywhere.herokuapp.com/https://3ff1u19bck.execute-api.us-east-1.amazonaws.com/test/upload/transcribe-notes/test.wav'
     axios.put(url, data, config).then(response => {
         console.log(response.data)
         // alert("Upload successful!!");
