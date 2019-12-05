@@ -134,11 +134,14 @@ function createDownloadLink(blob) {
 
 // Search image results
 $('#search-btn').click(function () {
+    console.log("Search button clicked");
     query = $('#search-phrase').val();
+    console.log("Search query from text box: ", query);
     params = { q: query };
     apigClient.searchGet(params, {}, {})
         .then(function (result) {
-
+            
+            // Search callback
             console.log(result);
 
             let img_list = result.data
@@ -150,8 +153,13 @@ $('#search-btn').click(function () {
             }
 
         }).catch(function (result) {
+            // Error callback
+            console.log("Error in fetching search results!")
             console.log(result);
         });
+        setTimeout(function () {
+            console.log("Search button clicked");
+        }.bind(this), 300);
 });
 
 // Expand the search icon
@@ -207,23 +215,28 @@ function searchPhotosS3(data) {
     console.log("Headers : ", config);
     url = 'https://cors-anywhere.herokuapp.com/https://3ff1u19bck.execute-api.us-east-1.amazonaws.com/test/upload/transcribe-notes/test.wav'
     axios.put(url, data, config).then(response => {
-        console.log(response.data)
-        // alert("Upload successful!!");
+        console.log("Axios PUT Response: ", response.data);
+        alert("Upload successful!!");
         query = "transcriptionStart";
         params = { q: query };
+        console.log("Params: ", params);
         apigClient.searchGet(params, {}, {})
             .then(function (result) {
                 // Success callback
+                console.log("q is transcriptionStart");
                 console.log(result);
             }).catch(function (result) {
                 // Error callback
+                console.log("Error for transcriptionStart");
                 console.log(result);
             });
         setTimeout(function () {
             params = { q: "transcriptionEnd" };
+            console.log("Params: ", params);
             apigClient.searchGet(params, {}, {})
                 .then(function (result) {
                     // Success callback
+                    console.log("q is transcriptionEnd");
                     console.log(result);
 
                     let img_list = result.data
@@ -241,6 +254,7 @@ function searchPhotosS3(data) {
                 }).catch(function (result) {
                     // Error callback
                     console.log(result);
+                    console.log("Error for transcriptionEnd");
                     alert("No images found!");
                 });
         }, 120000);
