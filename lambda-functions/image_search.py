@@ -55,7 +55,7 @@ def get_image_list(slots):
             object_keys = set()
             for photo in es_src:
                 labels = [word.lower() for word in photo['_source']['labels']]
-                if tag in labels:
+                if tag.lower() in labels:
                     object_key = photo['_source']['objectKey']
                     if object_key not in object_keys:
                         object_keys.add(object_key)
