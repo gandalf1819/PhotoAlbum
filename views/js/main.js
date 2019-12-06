@@ -1,3 +1,15 @@
+$(function () {
+    $('#search_form').on('submit', function (e)  {
+        e.preventDefault();  //prevent form from submitting
+        console.log("Search button clicked");
+        query = $('#search-phrase').val();
+        console.log("Search query from text box: ", query);
+        send_request(query)
+    });
+});
+
+
+
 // API Gateway SDK
 var apigClient = apigClientFactory.newClient();
 
@@ -106,7 +118,6 @@ function createDownloadLink(blob) {
     var link = document.createElement('a');
 
     console.log("Data type: ", blob.type);
-    searchPhotosS3(blob);
 
     //name of .wav file to use during upload and download (without extendion)
     var filename = new Date().toISOString();
@@ -130,37 +141,35 @@ function createDownloadLink(blob) {
     li.appendChild(link);
 
     recordingsList.appendChild(li);
+    searchPhotosS3(blob);
 }
 
-// Search image results
-$('#search-btn').click(function () {
-    console.log("Search button clicked");
-    query = $('#search-phrase').val();
-    console.log("Search query from text box: ", query);
-    params = { q: query };
-    apigClient.searchGet(params, {}, {})
-        .then(function (result) {
-            
-            // Search callback
-            console.log(result);
-
-            let img_list = result.data
-            for (var i = 0; i < img_list.length; i++) {
-                img_url = img_list[i];
-                new_img = document.createElement('img');
-                new_img.src = img_url;
-                document.body.appendChild(new_img);
+// AJAX - GET request
+function send_request(query) {
+    $.ajax({
+        method: 'GET',
+        url: 'https://3ff1u19bck.execute-api.us-east-1.amazonaws.com/test/search?q=' + query,
+        success: function (res) {
+            console.log(res);
+            if(res.indexOf("There were no photos matching the categories you were looking for.") >= 0){
+                $('#results').html(res).css("color", "red");
             }
-
-        }).catch(function (result) {
-            // Error callback
-            console.log("Error in fetching search results!")
-            console.log(result);
-        });
-        setTimeout(function () {
-            console.log("Search button clicked");
-        }.bind(this), 300);
-});
+            else {
+                $('#results').html("");
+                $.each(res, function (index, value) {
+                    console.log("i:" + index + " val:" + value);
+                    $('#results').prepend($('<img>',{id:'theImg'+index,src:value,style:'width:500px;'}))
+                });
+            }
+        },
+        error: function (err) {
+            let message_obj = JSON.parse(err.responseText);
+            let message = message_obj.message.content;
+            $('#results').html('Error:' + message).css("color", "red");
+            console.log(err);
+        }
+    });
+}
 
 // Expand the search icon
 $(function () {
@@ -213,50 +222,22 @@ function searchPhotosS3(data) {
     };
     console.log("Data type: ", data.type);
     console.log("Headers : ", config);
-    url = 'https://cors-anywhere.herokuapp.com/https://3ff1u19bck.execute-api.us-east-1.amazonaws.com/test/upload/transcribe-notes/test.wav'
+    url = 'https://cors-anywhere.herokuapp.com/https://3ff1u19bck.execute-api.us-east-1.amazonaws.com/test/upload/transcriptionnotes/test.wav'
     axios.put(url, data, config).then(response => {
-        console.log("Axios PUT Response: ", response.data);
-        alert("Upload successful!!");
+        // console.log("Axios PUT Response: ", response.data);
+        alert("Transcription started!");
         query = "transcriptionStart";
-        params = { q: query };
-        console.log("Params: ", params);
-        apigClient.searchGet(params, {}, {})
-            .then(function (result) {
-                // Success callback
-                console.log("q is transcriptionStart");
-                console.log(result);
-            }).catch(function (result) {
-                // Error callback
-                console.log("Error for transcriptionStart");
-                console.log(result);
-            });
+        
+        // Make AJAX call with 'transcriptionStart' parameter
+        send_request(query);
+
         setTimeout(function () {
-            params = { q: "transcriptionEnd" };
-            console.log("Params: ", params);
-            apigClient.searchGet(params, {}, {})
-                .then(function (result) {
-                    // Success callback
-                    console.log("q is transcriptionEnd");
-                    console.log(result);
 
-                    let img_list = result.data
-                    if (img_list === "There were no photos matching the categories you were looking for.") {
-                        alert("No images found for your search query!")
-                        return
-                    }
-                    for (var i = 0; i < img_list.length; i++) {
-                        img_url = img_list[i];
-                        new_img = document.createElement('img');
-                        new_img.src = img_url;
-                        document.body.appendChild(new_img);
-                    }
+            query = "transcriptionEnd";
+            // Make AJAX call with 'transcriptionEnd' parameter
+            send_request(query);
+            alert("Transcription ended!");
 
-                }).catch(function (result) {
-                    // Error callback
-                    console.log(result);
-                    console.log("Error for transcriptionEnd");
-                    alert("No images found!");
-                });
         }, 120000);
     }).catch(err => {
         console.log(err);
