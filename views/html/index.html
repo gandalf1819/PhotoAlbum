@@ -1,73 +1,82 @@
 <!DOCTYPE html>
-<html lang="en"> 
-  <head>
-      <title>PhotoAlbum</title>
-      <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-      <link rel="stylesheet" type="text/css" href="../css/style.css">
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-      <!-- ZMDI Material Design CDN -->
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css"> 
-      <!-- Latest compiled and minified CSS -->
-      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-      <!-- AWS SDK apigClient -->
-      <script type="text/javascript" src="../js/lib/axios/dist/axios.standalone.js"></script>
-      <script type="text/javascript" src="../js/lib/CryptoJS/rollups/hmac-sha256.js"></script>
-      <script type="text/javascript" src="../js/lib/CryptoJS/rollups/sha256.js"></script>
-      <script type="text/javascript" src="../js/lib/CryptoJS/components/hmac.js"></script>
-      <script type="text/javascript" src="../js/lib/CryptoJS/components/enc-base64.js"></script>
-      <script type="text/javascript" src="../js/lib/url-template/url-template.js"></script>
-      <script type="text/javascript" src="../js/lib/apiGatewayCore/sigV4Client.js"></script>
-      <script type="text/javascript" src="../js/lib/apiGatewayCore/apiGatewayClient.js"></script>
-      <script type="text/javascript" src="../js/lib/apiGatewayCore/simpleHttpClient.js"></script>
-      <script type="text/javascript" src="../js/lib/apiGatewayCore/utils.js"></script>
-      <script type="text/javascript" src="../js/apigClient.js"></script>
-    <body>
-      <!-- Real-time search using Amazon Transcribe -->
-      <div class="container">
-          <div class="search">
-              <form method="get">
-                <div class="search-input">
-                  <i class="zmdi zmdi-search zmdi-hc-2x"></i> 
-                  <input type="text" id="search-phrase" name="q"/>
-                  <i class="zmdi zmdi-mic zmdi-hc-2x"></i>
-                </div>
-                <div class="results">
-                </div>
-                <!-- Search Bar buttons -->
-                <div class="button-row">
-                  <button id="search-btn" type="submit">Search</button>
-                  <button id="start-btn" title="Start Recording"><i class="zmdi zmdi-play-circle-outline zmdi-hc-lg"></i></button>
-                  <button id="pause-btn" title="Pause Recording"><i class="zmdi zmdi-pause-circle-outline zmdi-hc-lg"></i></button>
-                  <div id="clear">Clear All</div>
-                </div>
-              </form>
-
-              <!-- Transcriptions -->
-              <div id="formats"></div>
-              <h4>Recordings</h4>
-              <ol id="recordingsList"></ol>
-
-              <!-- TODO: Image grid for search results -->
-              <p id="uploadText"></p>
-              <div>
-                <div class="banner-section" id="img-container">
-                  <p id="displaytext"></p>
-                </div>
-              </div>
-
-              <h3 id="result" style="color: green;"></h3>
-              <!-- File upload -->
-              <div class="input-group">
-                <input type="file" class="form-control" name="search" id="file_path">
-                <input type="button" class="button" value="Upload photos" id="upload-btn">
-                </div>
+<html lang="en">
+<head>
+    <title>PhotoAlbum</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <!-- ZMDI Material Design CDN -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <!-- AWS SDK apigClient -->
+    <script type="text/javascript"
+            src="../js/lib/axios/dist/axios.standalone.js"></script>
+    <script type="text/javascript"
+            src="../js/lib/CryptoJS/rollups/hmac-sha256.js"></script>
+    <script type="text/javascript" src="../js/lib/CryptoJS/rollups/sha256.js"></script>
+    <script type="text/javascript" src="../js/lib/CryptoJS/components/hmac.js"></script>
+    <script type="text/javascript"
+            src="../js/lib/CryptoJS/components/enc-base64.js"></script>
+    <script type="text/javascript"
+            src="../js/lib/url-template/url-template.js"></script>
+    <script type="text/javascript"
+            src="../js/lib/apiGatewayCore/sigV4Client.js"></script>
+    <script type="text/javascript"
+            src="../js/lib/apiGatewayCore/apiGatewayClient.js"></script>
+    <script type="text/javascript"
+            src="../js/lib/apiGatewayCore/simpleHttpClient.js"></script>
+    <script type="text/javascript" src="../js/lib/apiGatewayCore/utils.js"></script>
+    <script type="text/javascript" src="../js/apigClient.js"></script>
+</head>
+<body>
+<!-- Real-time search using Amazon Transcribe -->
+<div class="container">
+    <div class="search">
+        <form method="get" id="search_form">
+            <div class="search-input">
+                <i class="zmdi zmdi-search zmdi-hc-2x"></i>
+                <input type="text" id="search-phrase" name="q"/>
+                <i class="zmdi zmdi-mic zmdi-hc-2x"></i>
             </div>
-        </div>    
-      </div>
-      <!-- Inserting these scripts at the end to be able to use all the elements in the DOM -->
-      <script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
-      <!-- AWS Transcibe and File upload script -->
-      <script type="text/javascript" src="../js/main.js"></script>
-    </body>
-  </head>
+            <!-- Search Bar buttons -->
+            <div class="button-row">
+                <button id="search-btn" type="submit">Search</button>
+                <button id="start-btn" title="Start Recording"><i
+                        class="zmdi zmdi-play-circle-outline zmdi-hc-lg"></i></button>
+                <button id="pause-btn" title="Pause Recording"><i
+                        class="zmdi zmdi-pause-circle-outline zmdi-hc-lg"></i></button>
+                <div id="clear">Clear All</div>
+            </div>
+        </form>
+        <!-- Transcriptions -->
+        <div id="formats"></div>
+        <h4>Recordings</h4>
+        <ol id="recordingsList"></ol>
+
+        <!-- TODO: Image grid for search results -->
+        <p id="uploadText"></p>
+        <div>
+            <div class="banner-section" id="img-container">
+                <p id="displaytext"></p>
+            </div>
+        </div>
+
+        <h3 id="result" style="color: green;"></h3>
+        <!-- File upload -->
+        <div class="input-group">
+            <input type="file" class="form-control" name="search" id="file_path">
+            <input type="button" class="button" value="Upload photos" id="upload-btn">
+        </div>
+        <div id="results" style="margin-top: 20px">
+        </div>
+    </div>
+</div>
+<!-- Inserting these scripts at the end to be able to use all the elements in the DOM -->
+<script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
+<!-- AWS Transcibe and File upload script -->
+<script type="text/javascript" src="../js/main.js"></script>
+</body>
 </html>
