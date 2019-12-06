@@ -1,5 +1,4 @@
 import json
-import time
 
 import boto3
 import requests
@@ -81,7 +80,6 @@ def build_response(code, body):
 def lambda_handler(event, context):
     # recieve from API Gateway
     print("EVENT --- {}".format(json.dumps(event)))
-
     query_params = event["queryStringParameters"]
     if not query_params:
         return build_response(400, "Bad request, there was nothing in the query params")
@@ -142,7 +140,7 @@ def lambda_handler(event, context):
             Key='test.wav'
         )
 
-    slots, valid = get_slots_from_lex(event)
+    slots, valid = get_slots_from_lex(query)
     if not valid:
         build_response(200, "I could not understand what you want")
     img_list = get_image_list(slots)
