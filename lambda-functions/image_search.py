@@ -1,4 +1,5 @@
 import json
+import time
 
 import boto3
 import requests
@@ -12,9 +13,10 @@ def get_url(es_index, es_type):
     return url
 
 
-def get_slots_from_lex(event):
+def get_slots_from_lex(query):
     lex = boto3.client('lex-runtime')
-    query = event["queryStringParameters"]["q"]
+
+    # AWS Lex
     print("query:{}".format(query))
     lex_response = lex.post_text(
         botName='AlbumBot',
@@ -67,8 +69,10 @@ def build_response(code, body):
     return {
         'statusCode': code,
         'headers': {
-            "Access-Control-Allow-Origin": "*",
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT',
+            'Access-Control-Allow-Headers': 'Content-Type'
         },
         'body': json.dumps(body)
     }
@@ -77,6 +81,67 @@ def build_response(code, body):
 def lambda_handler(event, context):
     # recieve from API Gateway
     print("EVENT --- {}".format(json.dumps(event)))
+
+    query_params = event["queryStringParameters"]
+    if not query_params:
+        return build_response(400, "Bad request, there was nothing in the query params")
+    query = query_params["q"]
+    print("QueryStringParameters: ----", query)
+
+    # AWS Transcribe: Get transcribed text from voice recordings
+    if (query == "transcriptionStart"):
+        transcribe = boto3.client('transcribe')
+        job_name = time.strftime("%a %b %d %H:%M:%S %Y", time.localtime()).replace(":",
+                                                                                   "-").replace(
+            " ", "")
+        job_uri = "https://s3.amazonaws.com/transcribe-notes/test.wav"
+        transcribe.start_transcription_job(
+            TranscriptionJobName=job_name,
+            Media={'MediaFileUri': job_uri},
+            MediaFormat='wav',
+            LanguageCode='en-US'
+        )
+        while True:
+            status = transcribe.get_transcription_job(TranscriptionJobName=job_name)
+            if status['TranscriptionJob']['TranscriptionJobStatus'] in ['COMPLETED',
+                                                                        'FAILED']:
+                break
+            print("Transcription not ready yet!")
+            time.sleep(5)
+        print("Transcript URL: ", status)
+        transcriptURL = status['TranscriptionJob']['Transcript']['TranscriptFileUri']
+        trans_text = requests.get(transcriptURL).json()
+
+        print("Transcripts: ", trans_text)
+        print(trans_text["results"]['transcripts'][0]['transcript'])
+
+        s3client = boto3.client('s3')
+        response = s3client.delete_object(
+            Bucket='transcribe-notes',
+            Key='test.wav'
+        )
+        query = trans_text["results"]['transcripts'][0]['transcript']
+        s3client.put_object(Body=query, Bucket='transcribe-notes', Key='test.wav')
+        return {
+            'statusCode': 200,
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, POST, PUT',
+                'Access-Control-Allow-Headers': 'Content-Type'
+            },
+            'body': "Transcription completed"
+        }
+
+    if (query == "transcriptionEnd"):
+        s3client = boto3.client('s3')
+        data = s3client.get_object(Bucket='transcribe-notes', Key='test.wav')
+        query = data.get('Body').read().decode('utf-8')
+        print("Voice query: ", query)
+        s3client.delete_object(
+            Bucket='transcribe-notes',
+            Key='test.wav'
+        )
+
     slots, valid = get_slots_from_lex(event)
     if not valid:
         build_response(200, "I could not understand what you want")
@@ -86,4 +151,4 @@ def lambda_handler(event, context):
         return build_response(200, img_list)
     else:
         return build_response(200,
-                       "There were no photos matching the categories you were looking for.")
+                              "There were no photos matching the categories you were looking for.")

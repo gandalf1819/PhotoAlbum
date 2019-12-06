@@ -1,3 +1,15 @@
+$(function () {
+    $('#search_form').on('submit', function (e)  {
+        e.preventDefault();  //prevent form from submitting
+        console.log("Search button clicked");
+        query = $('#search-phrase').val();
+        console.log("Search query from text box: ", query);
+        send_request(query)
+    });
+});
+
+
+
 // API Gateway SDK
 var apigClient = apigClientFactory.newClient();
 
@@ -132,35 +144,31 @@ function createDownloadLink(blob) {
     recordingsList.appendChild(li);
 }
 
-// Search image results
-$('#search-btn').click(function () {
-    console.log("Search button clicked");
-    query = $('#search-phrase').val();
-    console.log("Search query from text box: ", query);
-    params = { q: query };
-    apigClient.searchGet(params, {}, {})
-        .then(function (result) {
-            
-            // Search callback
-            console.log(result);
-
-            let img_list = result.data
-            for (var i = 0; i < img_list.length; i++) {
-                img_url = img_list[i];
-                new_img = document.createElement('img');
-                new_img.src = img_url;
-                document.body.appendChild(new_img);
+function send_request(query) {
+    $.ajax({
+        method: 'GET',
+        url: 'https://3ff1u19bck.execute-api.us-east-1.amazonaws.com/Prod/search?q=' + query,
+        success: function (res) {
+            console.log(res);
+            if(res.indexOf("There were no photos matching the categories you were looking for.") >= 0){
+                $('#results').html(res).css("color", "red");
             }
-
-        }).catch(function (result) {
-            // Error callback
-            console.log("Error in fetching search results!")
-            console.log(result);
-        });
-        setTimeout(function () {
-            console.log("Search button clicked");
-        }.bind(this), 300);
-});
+            else {
+                $('#results').html("");
+                $.each(res, function (index, value) {
+                    console.log("i:" + index + " val:" + value);
+                    $('#results').prepend($('<img>',{id:'theImg'+index,src:value,style:'width:500px;'}))
+                });
+            }
+        },
+        error: function (err) {
+            let message_obj = JSON.parse(err.responseText);
+            let message = message_obj.message.content;
+            $('#results').html('Error:' + message).css("color", "red");
+            console.log(err);
+        }
+    });
+}
 
 // Expand the search icon
 $(function () {
